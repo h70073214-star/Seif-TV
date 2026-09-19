@@ -7,20 +7,27 @@ workflows:
       java: 17
 
     scripts:
+      - name: Check source archive
+        script: |
+          echo "=== Files ==="
+          ls -lah
+          echo "=== ZIP check ==="
+          file SeifTV-Android-Source.zip || true
+          unzip -t SeifTV-Android-Source.zip
+
       - name: Extract project
         script: |
-          unzip -q SeifTV-Android-Source.zip
-
-      - name: Prepare Gradle
-        script: |
-          cd SeifTV-FINAL-Android-Project
-          gradle wrapper --gradle-version 8.7
-          chmod +x gradlew
+          rm -rf SeifTV-FINAL-Android-Project
+          mkdir -p SeifTV-FINAL-Android-Project
+          unzip -q SeifTV-Android-Source.zip -d SeifTV-FINAL-Android-Project
+          echo "=== Extracted ==="
+          find SeifTV-FINAL-Android-Project -maxdepth 2 -type f | head -50
 
       - name: Build APK
         script: |
           cd SeifTV-FINAL-Android-Project
-          gradle --no-daemon assembleDebug
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
 
     artifacts:
       - SeifTV-FINAL-Android-Project/app/build/outputs/apk/debug/*.apk
